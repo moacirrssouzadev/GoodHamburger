@@ -1,0 +1,154 @@
+@page "/menu"
+@using GoodHamburger.Web.Shared.Models
+@inject HttpClient Http
+
+<div class="menu-page">
+    <div class="page-header">
+        <div class="header-content">
+            <h1>Cardápio</h1>
+            <p class="subtitle">Conheça todos os nossos produtos deliciosos</p>
+        </div>
+    </div>
+
+    @if (menuItems == null)
+    {
+        <div class="loading-state">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Carregando...</span>
+            </div>
+            <p>Carregando cardápio...</p>
+        </div>
+    }
+    else if (!menuItems.Any())
+    {
+        <div class="empty-state">
+            <div class="empty-icon">🍔</div>
+            <h3>Nenhum item no cardápio</h3>
+            <p>Volte mais tarde para conhecer nossas novidades</p>
+        </div>
+    }
+    else
+    {
+        <div class="menu-container">
+            <div class="menu-section">
+                <h2 class="section-title">Sanduíches</h2>
+                <div class="items-list">
+                    @foreach (var item in menuItems.Where(i => i.Type == ItemType.Sandwich))
+                    {
+                        <MenuItemRow Item="@item" />
+                    }
+                </div>
+            </div>
+
+            <div class="menu-section">
+                <h2 class="section-title">Acompanhamentos</h2>
+                <div class="items-list">
+                    @foreach (var item in menuItems.Where(i => i.Type == ItemType.Fries))
+                    {
+                        <MenuItemRow Item="@item" />
+                    }
+                </div>
+            </div>
+
+            <div class="menu-section">
+                <h2 class="section-title">Refrigerantes</h2>
+                <div class="items-list">
+                    @foreach (var item in menuItems.Where(i => i.Type == ItemType.Drink))
+                    {
+                        <MenuItemRow Item="@item" />
+                    }
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+<style>
+    .menu-page {
+        padding: 2rem 0;
+    }
+
+    .page-header {
+        margin-bottom: 2rem;
+        padding: 2rem;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 12px;
+        color: white;
+    }
+
+    .header-content h1 {
+        margin: 0;
+        font-size: 2rem;
+        font-weight: 700;
+    }
+
+    .subtitle {
+        margin: 0.5rem 0 0 0;
+        opacity: 0.95;
+        font-size: 0.95rem;
+    }
+
+    .loading-state, .empty-state {
+        text-align: center;
+        padding: 3rem 2rem;
+        background: white;
+        border-radius: 12px;
+        border: 1px solid #eee;
+    }
+
+    .empty-icon {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+    }
+
+    .menu-container {
+        display: grid;
+        gap: 2rem;
+    }
+
+    .menu-section {
+        background: white;
+        border-radius: 12px;
+        padding: 1.5rem;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        border: 1px solid #f0f0f0;
+    }
+
+    .section-title {
+        margin: 0 0 1.5rem 0;
+        padding-bottom: 1rem;
+        border-bottom: 3px solid #667eea;
+        color: #333;
+        font-size: 1.3rem;
+        font-weight: 700;
+    }
+
+    .items-list {
+        display: grid;
+        gap: 0.5rem;
+    }
+</style>
+
+@code {
+    private List<MenuItem>? menuItems;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            menuItems = await Http.GetFromJsonAsync<List<MenuItem>>("api/menu");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Erro ao carregar cardápio: {ex.Message}");
+        }
+    }
+
+    private string TranslateType(ItemType type) => type switch
+    {
+        ItemType.Sandwich => "Sanduíche",
+        ItemType.Fries => "Acompanhamento",
+        ItemType.Drink => "Refrigerante",
+        _ => type.ToString()
+    };
+}

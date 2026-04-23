@@ -1,0 +1,139 @@
+.order-card {
+    border: none;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    background: white;
+    overflow: hidden;
+    margin-bottom: 16px;
+    transition: all 0.3s ease;
+}
+
+.order-card:hover {
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+    transform: translateY(-2px);
+}
+
+.order-card-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.order-id-badge .badge {
+    background: rgba(255, 255, 255, 0.25);
+    color: white;
+    font-size: 0.95rem;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+}
+
+.order-date small {
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.order-card-body {
+    padding: 1.5rem;
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 1.5rem;
+}
+
+.order-items h6 {
+    margin-bottom: 0.75rem;
+    color: #333;
+    font-weight: 600;
+}
+
+.items-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.items-list li {
+    padding: 0.5rem 0;
+    color: #666;
+    font-size: 0.95rem;
+    border-bottom: 1px solid #eee;
+}
+
+.items-list li:last-child {
+    border-bottom: none;
+}
+
+.order-summary {
+    background: #f8f9fa;
+    padding: 1rem;
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.summary-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.95rem;
+}
+
+.summary-row span {
+    color: #666;
+}
+
+.summary-row.discount strong {
+    color: #28a745;
+}
+
+.summary-row.total {
+    border-top: 2px solid #ddd;
+    padding-top: 0.75rem;
+    font-size: 1.1rem;
+}
+
+.summary-row.total span {
+    font-weight: 600;
+    color: #333;
+}
+
+.summary-row.total strong {
+    color: #ff6b35;
+    font-size: 1.2rem;
+}
+
+.order-card-footer {
+    padding: 1rem;
+    background: #f8f9fa;
+    display: flex;
+    gap: 0.5rem;
+    border-top: 1px solid #eee;
+}
+
+.order-card-footer .btn {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+@media (max-width: 768px) {
+    .order-card-header {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .order-card-body {
+        grid-template-columns: 1fr;
+    }
+
+    .order-card-footer {
+        flex-direction: column;
+    }
+
+    .order-card-footer .btn {
+        width: 100%;
+    }
+}

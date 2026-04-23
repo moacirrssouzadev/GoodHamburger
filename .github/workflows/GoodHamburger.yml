@@ -1,0 +1,98 @@
+name: Good Hamburger CI/CD
+
+on:
+  push:
+    branches: [ "main", "develop" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  # ─────────────────────────────────────────────
+  # Job 1 – Build & Test API (.NET 8)
+  # ─────────────────────────────────────────────
+  build-api:
+    name: Build & Test API
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup .NET 8
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Restore dependencies
+        run: dotnet restore GoodHamburger-Api/src/GoodHamburger.API/GoodHamburger.API.csproj
+
+      - name: Build
+        run: |
+          dotnet build GoodHamburger-Api/src/GoodHamburger.API/GoodHamburger.API.csproj \
+            --no-restore \
+            --configuration Release
+
+      # O teste do SQLite não precisa de serviço externo
+      - name: Test
+        run: |
+          dotnet test GoodHamburger-Api/src/GoodHamburger.API/GoodHamburger.API.csproj \
+            --no-build \
+            --configuration Release \
+            --verbosity normal
+
+  # ─────────────────────────────────────────────
+  # Job 2 – Build Web (.NET 10)
+  # ─────────────────────────────────────────────
+  build-web:
+    name: Build & Test Web
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # DEBUG — mostra a estrutura real do repo
+      - name: List files
+        run: ls -R
+
+      - name: Setup .NET 10
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+
+      # 🔥 Ajustado para estrutura com /src/
+      - name: Restore dependencies
+        run: dotnet restore GoodHamburger-Web/GoodHamburger.Web/GoodHamburger.Web.csproj
+
+      - name: Build
+        run: |
+          dotnet build GoodHamburger-Web/GoodHamburger.Web/GoodHamburger.Web.csproj \
+              --no-restore \
+              --configuration Release
+
+
+  # ─────────────────────────────────────────────
+  # Job 3 – Docker Build Check
+  # ─────────────────────────────────────────────
+  docker-check:
+    name: Docker Build Check
+    runs-on: ubuntu-latest
+    needs: [ build-api, build-web ]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Build API Docker Image
+        run: |
+          docker build \
+            -t goodhamburger-api \
+            -f GoodHamburger-Api/src/GoodHamburger.API/Dockerfile \
+            GoodHamburger-Api/
+
+      - name: Build Web Docker Image
+        run: |
+          docker build \
+            -t goodhamburger-web \
+            -f GoodHamburger-Web/Dockerfile \
+            GoodHamburger-Web/

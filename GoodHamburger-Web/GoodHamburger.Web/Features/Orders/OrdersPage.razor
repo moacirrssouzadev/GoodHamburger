@@ -1,0 +1,146 @@
+@page "/"
+@using GoodHamburger.Web.Shared.Models
+@inject HttpClient Http
+@inject NavigationManager Navigation
+
+<div class="orders-page">
+    <div class="page-header">
+        <div class="header-content">
+            <h1>Pedidos</h1>
+            <p class="subtitle">Gerencie todos os seus pedidos em um único lugar</p>
+        </div>
+        <button class="btn btn-primary btn-lg" @onclick="NewOrder">
+            <i class="bi bi-plus-circle"></i> Novo Pedido
+        </button>
+    </div>
+
+    @if (orders == null)
+    {
+        <div class="loading-state">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Carregando...</span>
+            </div>
+            <p>Carregando seus pedidos...</p>
+        </div>
+    }
+    else if (!orders.Any())
+    {
+        <div class="empty-state">
+            <div class="empty-icon">📋</div>
+            <h3>Nenhum pedido registrado</h3>
+            <p>Comece criando seu primeiro pedido clicando no botão acima</p>
+        </div>
+    }
+    else
+    {
+        <div class="orders-grid">
+            @foreach (var order in orders)
+            {
+                <OrderCard 
+                    Order="@order" 
+                    OnEdit="@EditOrder"
+                    OnDelete="@DeleteOrder"
+                />
+            }
+        </div>
+    }
+</div>
+
+<style>
+    .orders-page {
+        padding: 2rem 0;
+    }
+
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+        padding: 2rem;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 12px;
+        color: white;
+    }
+
+    .header-content h1 {
+        margin: 0;
+        font-size: 2rem;
+        font-weight: 700;
+    }
+
+    .subtitle {
+        margin: 0.5rem 0 0 0;
+        opacity: 0.95;
+        font-size: 0.95rem;
+    }
+
+    .loading-state, .empty-state {
+        text-align: center;
+        padding: 3rem 2rem;
+        background: white;
+        border-radius: 12px;
+        border: 1px solid #eee;
+    }
+
+    .empty-icon {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+    }
+
+    .orders-grid {
+        display: grid;
+        gap: 1rem;
+    }
+
+    @@media (max-width: 768px) {
+        .page-header {
+            flex-direction: column;
+            text-align: center;
+            gap: 1rem;
+        }
+
+        .header-content h1 {
+            font-size: 1.5rem;
+        }
+    }
+</style>
+
+@code {
+    private List<Order>? orders;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadOrders();
+    }
+
+    private async Task LoadOrders()
+    {
+        try
+        {
+            orders = await Http.GetFromJsonAsync<List<Order>>("api/orders");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Erro ao carregar pedidos: {ex.Message}");
+        }
+    }
+
+    private void NewOrder()
+    {
+        Navigation.NavigateTo("/create-order");
+    }
+
+    private void EditOrder(Guid id)
+    {
+        Navigation.NavigateTo($"/edit-order/{id}");
+    }
+
+    private async Task DeleteOrder(Guid id)
+    {
+        var response = await Http.DeleteAsync($"api/orders/{id}");
+        if (response.IsSuccessStatusCode)
+        {
+            await LoadOrders();
+        }
+    }
+}

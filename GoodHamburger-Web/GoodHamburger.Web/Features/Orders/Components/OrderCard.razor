@@ -1,0 +1,62 @@
+@using GoodHamburger.Web.Shared.Models
+
+<div class="order-card">
+    <div class="order-card-header">
+        <div class="order-id-badge">
+            <span class="badge">Pedido #@Order.Id.ToString().Substring(0, 8)</span>
+        </div>
+        <div class="order-date">
+            <small class="text-muted">@Order.CreatedAt.ToShortDateString() @Order.CreatedAt.ToShortTimeString()</small>
+        </div>
+    </div>
+
+    <div class="order-card-body">
+        <div class="order-items">
+            <h6>Itens:</h6>
+            <ul class="items-list">
+                @foreach (var item in Order.Items)
+                {
+                    <li>@item.Name - @item.Price.ToString("C")</li>
+                }
+            </ul>
+        </div>
+
+        <div class="order-summary">
+            <div class="summary-row">
+                <span>Subtotal:</span>
+                <strong>@Order.Subtotal.ToString("C")</strong>
+            </div>
+            @if (Order.DiscountAmount > 0)
+            {
+                <div class="summary-row discount">
+                    <span>Desconto:</span>
+                    <strong>-@Order.DiscountAmount.ToString("C")</strong>
+                </div>
+            }
+            <div class="summary-row total">
+                <span>Total:</span>
+                <strong>@Order.Total.ToString("C")</strong>
+            </div>
+        </div>
+    </div>
+
+    <div class="order-card-footer">
+        <button class="btn btn-sm btn-primary" @onclick="() => OnEdit.InvokeAsync(Order.Id)">
+            <i class="bi bi-pencil"></i> Editar
+        </button>
+        <button class="btn btn-sm btn-danger" @onclick="() => OnDelete.InvokeAsync(Order.Id)">
+            <i class="bi bi-trash"></i> Excluir
+        </button>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public Order Order { get; set; } = new();
+
+    [Parameter]
+    public EventCallback<Guid> OnEdit { get; set; }
+
+    [Parameter]
+    public EventCallback<Guid> OnDelete { get; set; }
+}

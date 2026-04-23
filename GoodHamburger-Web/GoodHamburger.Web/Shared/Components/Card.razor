@@ -1,0 +1,20 @@
+@* Componente genérico de Card reutilizável *@
+<div class="card-component">
+    @if (!string.IsNullOrEmpty(Title))
+    {
+        <div class="card-header">
+            <h5 class="card-title">@Title</h5>
+        </div>
+    }
+    <div class="card-body">
+        @ChildContent
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public string? Title { get; set; }
+
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+}

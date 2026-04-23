@@ -1,0 +1,85 @@
+@using GoodHamburger.Web.Shared.Models
+
+<div class="category-section">
+    <div class="category-header">
+        <h5>@CategoryName</h5>
+        <span class="category-badge">@Items.Count item(s)</span>
+    </div>
+    
+    <div class="items-grid">
+        @foreach (var item in Items)
+        {
+            <MenuItemCard 
+                Item="@item" 
+                IsSelected="@SelectedIds.Contains(item.Id)"
+                OnSelectionChanged="@((bool selected) => OnItemSelected.InvokeAsync((item.Id, selected)))"
+            />
+        }
+    </div>
+</div>
+
+<style>
+    .category-section {
+        background: white;
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        border: 1px solid #f0f0f0;
+    }
+
+    .category-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+        padding-bottom: 1rem;
+        border-bottom: 2px solid #f0f0f0;
+    }
+
+    .category-header h5 {
+        margin: 0;
+        color: #333;
+        font-weight: 700;
+        font-size: 1.1rem;
+    }
+
+    .category-badge {
+        background: #e9ecef;
+        color: #666;
+        padding: 0.25rem 0.75rem;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 500;
+    }
+
+    .items-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 1rem;
+    }
+
+    @@media (max-width: 768px) {
+        .items-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .category-section {
+            padding: 1rem;
+        }
+    }
+</style>
+
+@code {
+    [Parameter]
+    public string CategoryName { get; set; } = "";
+
+    [Parameter]
+    public List<MenuItem> Items { get; set; } = new();
+
+    [Parameter]
+    public HashSet<int> SelectedIds { get; set; } = new();
+
+    [Parameter]
+    public EventCallback<(int, bool)> OnItemSelected { get; set; }
+}
